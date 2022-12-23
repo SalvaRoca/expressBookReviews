@@ -20,39 +20,96 @@ public_users.post("/register", (req,res) => {
     return res.status(404).json({message: "A error ocurred when trying to register user, please try again."});
   });
 
-// Task 1: Get the book list available in the shop
-public_users.get('/',function (req, res) {
-    res.send(JSON.stringify(books,null,4));
+// Function with a Promise to be called for async GET requests
+function getBooksPromise(booksRouter) { 
+    return new Promise((resolve, reject) => {
+        if (booksRouter) {
+            resolve(booksRouter);
+        } else {
+            reject("No books were found, please try again with different parameters.");
+        }
+    });
+}
+
+// Task 1: Get the list of books available in the shop
+//public_users.get('/', function (req, res) {
+//    res.send(books);
+//});
+
+// Task 10: Get the list of books available in the shop by async/await
+public_users.get('/', async function (req, res) {
+    let bookList = await getBooksPromise(books);
+    res.send(bookList);
 });
 
 // Task 2: Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+//public_users.get('/isbn/:isbn', function (req, res) {
+//    const isbn = req.params.isbn;
+//    res.send(books[isbn])
+//});
+
+//Task 11: Get book details based on ISBN by Promise
+public_users.get('/isbn/:isbn', function (req, res) {
     const isbn = req.params.isbn;
-    res.send(books[isbn])
+    getBooksPromise(books[isbn])
+    .then(
+        result => res.send(result),
+        error => res.send(error)
+    )
  });
-  
+
 // Task 3: Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+//public_users.get('/author/:author',function (req, res) {
+//    const author = req.params.author;
+//    let book = [];
+//
+//    Object.keys(books).forEach(i => {
+//        if(books[i].author.toLowerCase() == author.toLowerCase()){
+//            book.push(books[i)
+//        }
+//    });
+//    res.send(book);
+//});
+
+//Task 12: Get book details based on author by async/await
+public_users.get('/author/:author', async function (req, res) {
     const author = req.params.author;
     let book = [];
-    Object.keys(books).forEach(x => {
-        if(books[x].author.toLowerCase() == author.toLowerCase()){
-            book.push(books[x])
+    let bookList = await getBooksPromise(books);
+
+    Object.keys(bookList).forEach(i => {
+        if(bookList[i].author.toLowerCase() == author.toLowerCase()){
+            book.push(books[i])
         }
     });
-    res.send(book)
+    res.send(book);
 });
 
-// Task 4: Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+// Task 4: Get book details based on title
+//public_users.get('/title/:title',function (req, res) {
+//    const title = req.params.title;
+//    let book = [];
+//
+//    Object.keys(books).forEach(i => {
+//        if(books[i].title.toLowerCase() == title.toLowerCase()){
+//            book.push(books[i])
+//        }
+//    });
+//    res.send(book)
+//});
+
+// Task 13: Get book details based on title by async/await
+public_users.get('/title/:title', async function (req, res) {
     const title = req.params.title;
     let book = [];
-    Object.keys(books).forEach(x => {
-        if(books[x].title.toLowerCase() == title.toLowerCase()){
-            book.push(books[x])
+    let bookList = await getBooksPromise(books);
+
+    Object.keys(bookList).forEach(i => {
+        if(bookList[i].title.toLowerCase() == title.toLowerCase()){
+            book.push(bookList[i])
         }
     });
-    res.send(book)
+    res.send(book);
 });
 
 //  Task 5: Get book review
